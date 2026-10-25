@@ -2,12 +2,18 @@ import {quotes} from "./quotes.js"
 
 const imageWidth = window.innerWidth
 const timeText = document.getElementById("time-text")
-const greetingText = document.getElementById("greeting-text")
+const greetingEL = document.getElementById("greeting")
 const weatherEL = document.getElementById("weather")
 const quoteText = document.getElementById("quote-text")
-const greetings = ["Good morning", "Good afternoon", "Good night"]
-const myName = "Ziad" 
+const nameInput = document.getElementById("name-input")
+const submitNameBtn = document.getElementById("sumbit-name")
+const greetings = ["Good morning", "Good afternoon", "Good night"] 
 const weatherMaxAge = 30 * 60 * 1000
+
+submitNameBtn.addEventListener("click", (e) => {
+    e.preventDefault()
+    getUserName()
+})
 
 async function getNewBg(){
     try{
@@ -27,17 +33,17 @@ async function getNewBg(){
 }
 
 
-function GetstoredBg(item){
+function getStored(item){
     const storedData = localStorage.getItem(item)
     return storedData ? JSON.parse(storedData) : null
 }
 
 
 async function loadbg(){
-    let img = GetstoredBg("background")
+    let img = getStored("background")
     if(!img || img.date !== new Date().toDateString()){
         await getNewBg()
-        img = GetstoredBg("background")
+        img = getStored("background")
         
     }
 
@@ -56,14 +62,27 @@ function renderTime(){
     timeText.textContent = time
 }
 
-function renderGreeting(){
+function getUserName(){
+    const name = nameInput.value
+    localStorage.setItem("name", JSON.stringify(name))
+    renderGreeting(name)
+}
+
+function checkName(){
+    const name = getStored("name")
+    if(name){
+        renderGreeting(name)
+    }
+}
+
+function renderGreeting(name){
     const hourTime = new Date().getHours()
     if(hourTime < 12){
-        greetingText.textContent = `${greetings[0]}, ${myName}`
+        greetingEL.innerHTML = `<h2>${greetings[0]}, ${name}</h2>`
     }else if(hourTime < 18){
-        greetingText.textContent = `${greetings[1]}, ${myName}`
+        greetingEL.innerHTML = `<h2>${greetings[1]}, ${name}</h2>`
     }else{
-        greetingText.textContent = `${greetings[2]}, ${myName}`
+        greetingEL.innerHTML = `<h2>${greetings[2]}, ${name}</h2>`
     }
 }
 
@@ -106,7 +125,7 @@ function getCurrentWeather(){
 }
 
 function renderWeather(){
-    const weather = GetstoredBg("weather")
+    const weather = getStored("weather")
     if(weather && Date.now() - weather.time < weatherMaxAge){
        drawWeather(weather)
     }else{
@@ -120,9 +139,9 @@ function renderQoute(){
     quoteText.textContent= qoute
 }
 
+checkName()
 renderQoute()
 renderWeather()
-renderGreeting()
 renderTime()
 setInterval(renderTime, 1000)
 loadbg()

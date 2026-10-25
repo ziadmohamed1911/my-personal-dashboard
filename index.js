@@ -1,6 +1,7 @@
 const imageWidth = window.innerWidth
 const timeText = document.getElementById("time-text")
 const greetingText = document.getElementById("greeting-text")
+const weatherEL = document.getElementById("weather")
 const greetings = ["Good morning", "Good afternoon", "Good night"]
 const myName = "Ziad" 
 
@@ -22,22 +23,21 @@ async function getNewBg(){
 }
 
 
-function GetstoredBg(){
-    const storedData = localStorage.getItem("background")
+function GetstoredBg(item){
+    const storedData = localStorage.getItem(item)
     return storedData ? JSON.parse(storedData) : null
 }
 
 
 async function loadbg(){
-    let img = GetstoredBg()
+    let img = GetstoredBg("background")
     if(!img || img.date !== new Date().toDateString()){
         await getNewBg()
-        img = GetstoredBg()
+        img = GetstoredBg("background")
         
     }
 
     if(img){
-        console.log(img)
         document.body.style.backgroundImage = `url("${img.url}")`
     }
 }
@@ -63,6 +63,45 @@ function renderGreeting(){
     }
 }
 
+function getCurrentWeather(){
+    navigator.geolocation.getCurrentPosition(async position => {
+        try{
+            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=595dc0173f26820aa01b6b247c4915dc&lat=${position.coords.latitude}&units=metric&lon=${position.coords.longitude}`)
+            const data = await res.json()
+            console.log(data)
+            const weather = {
+                iconUrl : `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
+                iconAlt : data.weather[0].description,
+                temp : data.main.temp,
+                city : data.name,
+                date : new Date().toDateString()
+            }
+            localStorage.setItem("weather", JSON.stringify(weather))
+        }catch(err){
+            console.log(err)
+        }
+        
+    })
+}
+
+function renderWeather(){
+    let weather = GetstoredBg("weather")
+    if(!weather || weather.date !== new Date().toDateString()){
+        getCurrentWeather()
+        weather = GetstoredBg("weather") 
+    }
+
+    if(weather){
+        weatherEL.innerHTML = `
+        <div class="weather-top">
+            <img src="${weather.iconUrl}" alt="${weather.iconAlt}">
+            <p class="weather-temp">${Math.round(weather.temp)}°</p>
+        </div>
+        <p class="city">${weather.city}</p>`
+    }
+}
+
+renderWeather()
 renderGreeting()
 renderTime()
 setInterval(renderTime, 1000)

@@ -4,4 +4,10 @@
 
 body{
     margin: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    color: white;
+    text-shadow: 0 0 10px #dad6d6;
 }

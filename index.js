@@ -1,9 +1,13 @@
+import {quotes} from "./quotes.js"
+
 const imageWidth = window.innerWidth
 const timeText = document.getElementById("time-text")
 const greetingText = document.getElementById("greeting-text")
 const weatherEL = document.getElementById("weather")
+const quoteText = document.getElementById("quote-text")
 const greetings = ["Good morning", "Good afternoon", "Good night"]
 const myName = "Ziad" 
+const weatherMaxAge = 30 * 60 * 1000
 
 async function getNewBg(){
     try{
@@ -63,44 +67,60 @@ function renderGreeting(){
     }
 }
 
+function drawWeather(weather){
+    weatherEL.innerHTML = `
+        <div class="weather-top">
+            <img src="${weather.iconUrl}">
+            <p class="weather-temp">${Math.round(weather.temp)}°</p>
+        </div>
+        <p class="city"></p>`
+        weatherEL.querySelector("img").alt = weather.iconAlt
+        weatherEL.querySelector(".city").textContent = weather.city
+}
+
 function getCurrentWeather(){
     navigator.geolocation.getCurrentPosition(async position => {
         try{
             const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=595dc0173f26820aa01b6b247c4915dc&lat=${position.coords.latitude}&units=metric&lon=${position.coords.longitude}`)
+            if(!res.ok){
+                throw Error("couldn't get weather")
+            }
             const data = await res.json()
-            console.log(data)
             const weather = {
                 iconUrl : `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
                 iconAlt : data.weather[0].description,
                 temp : data.main.temp,
                 city : data.name,
-                date : new Date().toDateString()
+                time : Date.now()
             }
             localStorage.setItem("weather", JSON.stringify(weather))
+            drawWeather(weather)
         }catch(err){
             console.log(err)
+            weatherEL.textContent = "Weather unavailable"
         }
         
+    },() => {
+        weatherEL.textContent = "Location blocked"
     })
 }
 
 function renderWeather(){
-    let weather = GetstoredBg("weather")
-    if(!weather || weather.date !== new Date().toDateString()){
+    const weather = GetstoredBg("weather")
+    if(weather && Date.now() - weather.time < weatherMaxAge){
+       drawWeather(weather)
+    }else{
         getCurrentWeather()
-        weather = GetstoredBg("weather") 
-    }
-
-    if(weather){
-        weatherEL.innerHTML = `
-        <div class="weather-top">
-            <img src="${weather.iconUrl}" alt="${weather.iconAlt}">
-            <p class="weather-temp">${Math.round(weather.temp)}°</p>
-        </div>
-        <p class="city">${weather.city}</p>`
     }
 }
 
+function renderQoute(){
+    const getRandom = (arr)=> arr[Math.floor(Math.random()* arr.length)]
+    const qoute = getRandom(quotes)
+    quoteText.textContent= qoute
+}
+
+renderQoute()
 renderWeather()
 renderGreeting()
 renderTime()

@@ -73,3 +73,10 @@ body{
     margin-top: -0.6em;
     text-align: center;
 }
+
+.quote{
+    align-self: flex-start;
+    margin-left: 0.8em;
+    font-size: 1.3rem;
+    font-weight: 300;
+}

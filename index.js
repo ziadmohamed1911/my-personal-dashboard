@@ -1,6 +1,7 @@
 import {quotes} from "./quotes.js"
 
 const imageWidth = window.innerWidth
+const imageHeight = window.innerHeight
 const timeText = document.getElementById("time-text")
 const greetingEL = document.getElementById("greeting")
 const weatherEL = document.getElementById("weather")
@@ -17,13 +18,13 @@ submitNameBtn.addEventListener("click", (e) => {
 
 async function getNewBg(){
     try{
-        const res = await fetch("https://api.unsplash.com/photos/random?query=marvel&client_id=Zyahzk9XJf18wQ_RnIpcrWbm9bVcNbujYTT-6Bq0dSU")
+        const res = await fetch(`https://api.unsplash.com/photos/random?query=marvel&client_id=Zyahzk9XJf18wQ_RnIpcrWbm9bVcNbujYTT-6Bq0dSU`)
         if(!res.ok){
             throw Error("couldn't get image")
         }
         const data = await res.json()
         const img = {
-            url : `${data.urls.raw}?w=${imageWidth}`,
+            url : `${data.urls.raw}&w=${imageWidth}&h=${imageHeight}&fit=crop`,
             date : new Date().toDateString()
         }
         localStorage.setItem("background", JSON.stringify(img))

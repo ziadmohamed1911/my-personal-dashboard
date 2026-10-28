@@ -8,7 +8,7 @@ const weatherEL = document.getElementById("weather")
 const quoteText = document.getElementById("quote-text")
 const nameInput = document.getElementById("name-input")
 const submitNameBtn = document.getElementById("submit-name")
-const greetings = ["Good morning", "Good afternoon", "Good night"] 
+const greetings = ["Good morning", "Good afternoon", "Good night"]
 const weatherMaxAge = 30 * 60 * 1000
 
 const svgWrap = (inner) => `<svg class="weather-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`
@@ -38,36 +38,31 @@ submitNameBtn.addEventListener("click", (e) => {
     getUserName()
 })
 
-async function getNewBg(){
-    try{
-        const res = await fetch(`https://api.unsplash.com/photos/random?query=marvel&client_id=Zyahzk9XJf18wQ_RnIpcrWbm9bVcNbujYTT-6Bq0dSU`)
-        if(!res.ok){
-            throw Error("couldn't get image")
-        }
-        const data = await res.json()
-        const img = {
-            url : `${data.urls.raw}&w=${imageWidth}&h=${imageHeight}&fit=crop`,
-            date : new Date().toDateString()
-        }
-        localStorage.setItem("background", JSON.stringify(img))
-    }catch(err){
-        document.body.style.backgroundImage = `url("https://images.unsplash.com/photo-1568833450751-fba3c6b2d129?w=${imageWidth}")`
-    }
-}
-
-
 function getStored(item){
     const storedData = localStorage.getItem(item)
     return storedData ? JSON.parse(storedData) : null
 }
 
+async function getNewBg(){
+    try{
+        const res = await fetch("/api/background")
+        if(!res.ok) throw Error("couldn't get background")
+        const data = await res.json()
+        const bg = {
+            url: `${data.urls.raw}&w=${imageWidth}&h=${imageHeight}&fit=crop`,
+            date: new Date().toDateString()
+        }
+        localStorage.setItem("background", JSON.stringify(bg))
+    }catch(err){
+        console.log("There was an error with the API", err)
+    }
+}
 
 async function loadbg(){
     let img = getStored("background")
     if(!img || img.date !== new Date().toDateString()){
         await getNewBg()
         img = getStored("background")
-        
     }
 
     if(img){
@@ -86,7 +81,8 @@ function renderTime(){
 }
 
 function getUserName(){
-    const name = nameInput.value
+    const name = nameInput.value.trim()
+    if(!name) return
     localStorage.setItem("name", JSON.stringify(name))
     renderGreeting(name)
 }
@@ -100,13 +96,16 @@ function checkName(){
 
 function renderGreeting(name){
     const hourTime = new Date().getHours()
+    let greeting = greetings[2]
     if(hourTime < 12){
-        greetingEL.innerHTML = `<h2>${greetings[0]}, ${name}</h2>`
+        greeting = greetings[0]
     }else if(hourTime < 18){
-        greetingEL.innerHTML = `<h2>${greetings[1]}, ${name}</h2>`
-    }else{
-        greetingEL.innerHTML = `<h2>${greetings[2]}, ${name}</h2>`
+        greeting = greetings[1]
     }
+
+    const heading = document.createElement("h2")
+    heading.textContent = `${greeting}, ${name}`
+    greetingEL.replaceChildren(heading)
 }
 
 function getWeatherIcon(code = ""){
@@ -145,7 +144,7 @@ function getCoords(){
 async function getCurrentWeather(){
     try{
         const {lat, lon} = await getCoords()
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=595dc0173f26820aa01b6b247c4915dc&lat=${lat}&units=metric&lon=${lon}`)
+        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`)
         if(!res.ok){
             throw Error("couldn't get weather")
         }

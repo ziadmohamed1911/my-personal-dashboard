@@ -11,6 +11,14 @@ const submitNameBtn = document.getElementById("sumbit-name")
 const greetings = ["Good morning", "Good afternoon", "Good night"] 
 const weatherMaxAge = 30 * 60 * 1000
 
+const weatherIcons = {
+    "01d": "☀️", "01n": "🌙",
+    "02d": "⛅", "02n": "☁️",
+    "03": "☁️", "04": "☁️",
+    "09": "🌧️", "10d": "🌦️", "10n": "🌧️",
+    "11": "⛈️", "13": "❄️", "50": "🌫️"
+}
+
 submitNameBtn.addEventListener("click", (e) => {
     e.preventDefault()
     getUserName()
@@ -87,47 +95,65 @@ function renderGreeting(name){
     }
 }
 
+function getWeatherIcon(code = ""){
+    return weatherIcons[code] ?? weatherIcons[code.slice(0, 2)] ?? "🌡️"
+}
+
 function drawWeather(weather){
     weatherEL.innerHTML = `
         <div class="weather-top">
-            <img src="${weather.iconUrl}">
+            <span class="weather-icon"></span>
             <p class="weather-temp">${Math.round(weather.temp)}°</p>
         </div>
         <p class="city"></p>`
-        weatherEL.querySelector("img").alt = weather.iconAlt
-        weatherEL.querySelector(".city").textContent = weather.city
+    const icon = weatherEL.querySelector(".weather-icon")
+    icon.textContent = getWeatherIcon(weather.icon)
+    icon.title = weather.iconAlt
+    weatherEL.querySelector(".city").textContent = weather.city
 }
 
-function getCurrentWeather(){
-    navigator.geolocation.getCurrentPosition(async position => {
-        try{
-            const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=595dc0173f26820aa01b6b247c4915dc&lat=${position.coords.latitude}&units=metric&lon=${position.coords.longitude}`)
-            if(!res.ok){
-                throw Error("couldn't get weather")
+function getCoords(){
+    return new Promise((resolve, reject) => {
+        const saved = getStored("coords")
+        if(saved) return resolve(saved)
+
+        navigator.geolocation.getCurrentPosition(position => {
+            const coords = {
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
             }
-            const data = await res.json()
-            const weather = {
-                iconUrl : `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
-                iconAlt : data.weather[0].description,
-                temp : data.main.temp,
-                city : data.name,
-                time : Date.now()
-            }
-            localStorage.setItem("weather", JSON.stringify(weather))
-            drawWeather(weather)
-        }catch(err){
-            console.log(err)
-            weatherEL.textContent = "Weather unavailable"
-        }
-        
-    },() => {
-        weatherEL.textContent = "Location blocked"
+            localStorage.setItem("coords", JSON.stringify(coords))
+            resolve(coords)
+        }, reject)
     })
+}
+
+async function getCurrentWeather(){
+    try{
+        const {lat, lon} = await getCoords()
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=595dc0173f26820aa01b6b247c4915dc&lat=${lat}&units=metric&lon=${lon}`)
+        if(!res.ok){
+            throw Error("couldn't get weather")
+        }
+        const data = await res.json()
+        const weather = {
+            icon : data.weather[0].icon,
+            iconAlt : data.weather[0].description,
+            temp : data.main.temp,
+            city : data.name,
+            time : Date.now()
+        }
+        localStorage.setItem("weather", JSON.stringify(weather))
+        drawWeather(weather)
+    }catch(err){
+        console.log(err)
+        weatherEL.textContent = err.code === 1 ? "Location blocked" : "Weather unavailable"
+    }
 }
 
 function renderWeather(){
     const weather = getStored("weather")
-    if(weather && Date.now() - weather.time < weatherMaxAge){
+    if(weather && weather.icon && Date.now() - weather.time < weatherMaxAge){
        drawWeather(weather)
     }else{
         getCurrentWeather()

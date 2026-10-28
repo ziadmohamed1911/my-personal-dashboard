@@ -2,10 +2,14 @@
     "manifest_version": 3,
     "name": "Personal Dashboard",
     "version": "1.0.0",
-    "description": "Perosnal Dashboard To help make your day efficient",
-    "action": {
-        "default_icon": "images/icon.png"
+    "description": "Personal dashboard to help make your day efficient",
+    "icons": {
+        "128": "images/icons/icon.png"
     },
+    "action": {
+        "default_icon": "images/icons/icon.png"
+    },
+    "permissions": ["geolocation"],
     "chrome_url_overrides": {
         "newtab": "index.html"
     }

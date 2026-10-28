@@ -11,12 +11,26 @@ const submitNameBtn = document.getElementById("sumbit-name")
 const greetings = ["Good morning", "Good afternoon", "Good night"] 
 const weatherMaxAge = 30 * 60 * 1000
 
+const svgWrap = (inner) => `<svg class="weather-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`
+
+const cloudPath = "M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+const rainCloud = "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+
+const sun = svgWrap(`<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>`)
+const moon = svgWrap(`<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>`)
+const cloudSun = svgWrap(`<path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.947 12.65a4 4 0 0 0-5.925-4.128M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>`)
+const cloud = svgWrap(`<path d="${cloudPath}"/>`)
+const rain = svgWrap(`<path d="${rainCloud}"/><path d="M16 14v6M8 14v6M12 16v6"/>`)
+const storm = svgWrap(`<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/>`)
+const snow = svgWrap(`<path d="${rainCloud}"/><path d="M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01"/>`)
+const fog = svgWrap(`<path d="${rainCloud}"/><path d="M16 17H7M17 21H9"/>`)
+
 const weatherIcons = {
-    "01d": "☀️", "01n": "🌙",
-    "02d": "⛅", "02n": "☁️",
-    "03": "☁️", "04": "☁️",
-    "09": "🌧️", "10d": "🌦️", "10n": "🌧️",
-    "11": "⛈️", "13": "❄️", "50": "🌫️"
+    "01d": sun, "01n": moon,
+    "02d": cloudSun, "02n": cloud,
+    "03": cloud, "04": cloud,
+    "09": rain, "10": rain,
+    "11": storm, "13": snow, "50": fog
 }
 
 submitNameBtn.addEventListener("click", (e) => {
@@ -96,7 +110,7 @@ function renderGreeting(name){
 }
 
 function getWeatherIcon(code = ""){
-    return weatherIcons[code] ?? weatherIcons[code.slice(0, 2)] ?? "🌡️"
+    return weatherIcons[code] ?? weatherIcons[code.slice(0, 2)] ?? cloud
 }
 
 function drawWeather(weather){
@@ -107,7 +121,7 @@ function drawWeather(weather){
         </div>
         <p class="city"></p>`
     const icon = weatherEL.querySelector(".weather-icon")
-    icon.textContent = getWeatherIcon(weather.icon)
+    icon.innerHTML = getWeatherIcon(weather.icon)
     icon.title = weather.iconAlt
     weatherEL.querySelector(".city").textContent = weather.city
 }

@@ -132,3 +132,13 @@ form button:hover,
 form button:focus{
     transform: scale(1.03);
 }
+
+.weather-icon {
+    display: inline-flex;
+    color: white;
+}
+
+.weather-svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}

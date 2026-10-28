@@ -7,7 +7,7 @@ const greetingEL = document.getElementById("greeting")
 const weatherEL = document.getElementById("weather")
 const quoteText = document.getElementById("quote-text")
 const nameInput = document.getElementById("name-input")
-const submitNameBtn = document.getElementById("sumbit-name")
+const submitNameBtn = document.getElementById("submit-name")
 const greetings = ["Good morning", "Good afternoon", "Good night"] 
 const weatherMaxAge = 30 * 60 * 1000
 

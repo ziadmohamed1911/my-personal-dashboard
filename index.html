@@ -6,32 +6,33 @@
     <title>My personal dashboard</title>
 
     <!-- google fonts -->
-     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    
+
     <link rel="icon" type="image/svg+xml" href="images/icons/icon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="weather" id="weather">
+        <div class="weather" id="weather"></div>
 
-        </div>
         <div class="time-greeting">
             <h2 id="time-text"></h2>
             <div class="greeting" id="greeting">
                 <form>
-                <label for="name-input">Hello Freind!</label>
-                <div class="name-section">
-                    <input id="name-input" type="text" placeholder="What's your name?" required>
-                    <button type="submit" id="sumbit-name" class="btn">Sumbit</button>
-                </div>
+                    <label for="name-input">Hello Friend!</label>
+                    <div class="name-section">
+                        <input id="name-input" type="text" placeholder="What's your name?" required>
+                        <button type="submit" id="submit-name">Submit</button>
+                    </div>
                 </form>
             </div>
         </div>
+
         <p id="quote-text" class="quote"></p>
     </div>
+
+    <script src="index.js" type="module"></script>
 </body>
-<script src="index.js" type="module"></script>
 </html>

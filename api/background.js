@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://api.unsplash.com/photos/random?orientation=landscape&query=nature&client_id=${process.env.UNSPLASH_KEY}`
+      `https://api.unsplash.com/photos/random?orientation=landscape&query=marvel&client_id=${process.env.UNSPLASH_KEY}`
     )
 
     if (!response.ok) {

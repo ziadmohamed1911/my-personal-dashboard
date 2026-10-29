@@ -12,5 +12,6 @@
     "permissions": ["geolocation"],
     "chrome_url_overrides": {
         "newtab": "index.html"
-    }
+    },
+    "host_permissions": ["https://my-personal-dashboard-sepia.vercel.app/"]
 }

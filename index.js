@@ -1,5 +1,6 @@
 import {quotes} from "./quotes.js"
 
+const API_BASE = "https://YOUR-PROJECT.vercel.app"
 const imageWidth = window.innerWidth
 const imageHeight = window.innerHeight
 const timeText = document.getElementById("time-text")

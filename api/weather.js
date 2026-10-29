@@ -1,12 +1,32 @@
 export default async function handler(req, res) {
-  const { lat, lon } = req.query
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" })
+  }
+
+  const lat = Number(req.query.lat)
+  const lon = Number(req.query.lon)
+
+  if (
+    !Number.isFinite(lat) || !Number.isFinite(lon) ||
+    Math.abs(lat) > 90 || Math.abs(lon) > 180
+  ) {
+    return res.status(400).json({ error: "Invalid coordinates" })
+  }
 
   try {
-    const res = await fetch(`https://my-personal-dashboard-sepia.vercel.app/api/weather?lat=${lat}&lon=${lon}`)
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.WEATHER_KEY}`
+    )
+
+    if (!response.ok) {
+      return res.status(response.status).json({ error: "Weather provider error" })
+    }
+
     const data = await response.json()
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.status(200).json(data)
+    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=300")
+    return res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch weather" })
+    console.error(error)
+    return res.status(500).json({ error: "Failed to fetch weather" })
   }
 }

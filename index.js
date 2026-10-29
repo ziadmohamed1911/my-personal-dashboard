@@ -46,7 +46,7 @@ function getStored(item){
 
 async function getNewBg(){
     try{
-        const res = await fetch("/api/background")
+        const res = await fetch(`${API_BASE}/api/background`)
         if(!res.ok) throw Error("couldn't get background")
         const data = await res.json()
         const bg = {
@@ -145,7 +145,7 @@ function getCoords(){
 async function getCurrentWeather(){
     try{
         const {lat, lon} = await getCoords()
-        const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`)
+       const res = await fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`)
         if(!res.ok){
             throw Error("couldn't get weather")
         }

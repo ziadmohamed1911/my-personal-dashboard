@@ -10,8 +10,8 @@
         "default_icon": "images/icons/icon.png"
     },
     "permissions": ["geolocation"],
+    "host_premissons": ["my-personal-dashboard-sepia.vercel.app"],
     "chrome_url_overrides": {
         "newtab": "index.html"
-    },
-    "host_permissions": ["https://my-personal-dashboard-sepia.vercel.app/"]
+    }
 }

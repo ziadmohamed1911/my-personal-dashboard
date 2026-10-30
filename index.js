@@ -1,6 +1,9 @@
 import {quotes} from "./quotes.js"
 
-const API_BASE = "https://my-personal-dashboard-sepia.vercel.app/"
+const API_BASE = location.protocol === "chrome-extension:"
+    ? "https://my-personal-dashboard-sepia.vercel.app"
+    : ""
+const BG_VERSION = "marvel-2" 
 const imageWidth = window.innerWidth
 const imageHeight = window.innerHeight
 const timeText = document.getElementById("time-text")
@@ -49,9 +52,14 @@ async function getNewBg(){
         const res = await fetch(`${API_BASE}/api/background`)
         if(!res.ok) throw Error("couldn't get background")
         const data = await res.json()
+        const dpr = window.devicePixelRatio || 1
+        const w = Math.round(imageWidth * dpr)
+        const h = Math.round(imageHeight * dpr)
         const bg = {
-            url: `${data.urls.raw}&w=${imageWidth}&h=${imageHeight}&fit=crop`,
-            date: new Date().toDateString()
+            url: `${data.urls.raw}&w=${w}&h=${h}&fit=crop&crop=entropy&q=80&auto=format`,
+            date: new Date().toDateString(),
+            version: BG_VERSION,
+            size: `${imageWidth}x${imageHeight}`
         }
         localStorage.setItem("background", JSON.stringify(bg))
     }catch(err){
@@ -61,7 +69,8 @@ async function getNewBg(){
 
 async function loadbg(){
     let img = getStored("background")
-    if(!img || img.date !== new Date().toDateString()){
+    const size = `${imageWidth}x${imageHeight}`
+    if(!img || img.date !== new Date().toDateString() || img.version !== BG_VERSION || img.size !== size){
         await getNewBg()
         img = getStored("background")
     }
